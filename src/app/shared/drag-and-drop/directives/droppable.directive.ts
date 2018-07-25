@@ -14,6 +14,11 @@ export class DroppableDirective {
     this.droppableService.onDragStart(event);
   }
 
+  @HostListener('dragMove', ['$event'])
+  onDragMove(event: PointerEvent): void {
+    this.droppableService.onDragMove(event);
+  }
+
   @HostListener('dragEnd', ['$event'])
   ondragend(event: PointerEvent) {
     this.droppableService.onDragEnd(event);

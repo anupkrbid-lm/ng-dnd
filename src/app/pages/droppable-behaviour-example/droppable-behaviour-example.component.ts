@@ -1,10 +1,10 @@
 import { Component, OnInit } from '@angular/core';
-
-interface CurrentDraggingBox {
-  name: string;
-  index: number;
-  moveFrom: string;
-}
+const remove = (itemName: string, list: string[]) => {
+  const itemIndex = list.indexOf(itemName);
+  if (itemIndex > -1) {
+    list.splice(itemIndex, 1);
+  }
+};
 
 @Component({
   selector: 'app-droppable-behaviour-example',
@@ -12,7 +12,7 @@ interface CurrentDraggingBox {
   styleUrls: ['./droppable-behaviour-example.component.css']
 })
 export class DroppableBehaviourExampleComponent implements OnInit {
-  currentDraggingBox: CurrentDraggingBox;
+  currentDraggingBox?: string;
   availableBoxes = [
     'Box 1',
     'Box 2',
@@ -29,32 +29,11 @@ export class DroppableBehaviourExampleComponent implements OnInit {
 
   ngOnInit() {}
 
-  onDragStart(
-    event: PointerEvent,
-    boxName: string,
-    moveFrom: string,
-    boxIndex: number
-  ) {
-    this.currentDraggingBox = {
-      name: boxName,
-      index: boxIndex,
-      moveFrom: moveFrom
-    };
-  }
+  move(currentDraggingBox: string, toList: string[]) {
+    remove(currentDraggingBox, this.availableBoxes);
+    remove(currentDraggingBox, this.dropzone1Boxes);
+    remove(currentDraggingBox, this.dropzone2Boxes);
 
-  move(dropzone: string) {
-    this[`${dropzone}Boxes`].push(this.currentDraggingBox.name);
-    this[`${this.currentDraggingBox.moveFrom}Boxes`].splice(
-      this.currentDraggingBox.index,
-      1
-    );
-  }
-
-  remove() {
-    this[`${this.currentDraggingBox.moveFrom}Boxes`].splice(
-      this.currentDraggingBox.index,
-      1
-    );
-    this.availableBoxes.push(this.currentDraggingBox.name);
+    toList.push(currentDraggingBox);
   }
 }

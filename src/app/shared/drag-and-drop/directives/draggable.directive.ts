@@ -19,6 +19,7 @@ export class DraggableDirective {
 
   @HostBinding('class.draggable') draggable = true;
   @HostBinding('class.dragging') dragging = false;
+  @HostBinding('attr.touch-action') touchAction = 'none';
 
   constructor(public element: ElementRef) {}
 

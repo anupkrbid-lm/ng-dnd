@@ -1,5 +1,9 @@
-<nav>
-  <a *ngFor="let nav of navigations" routerLinkActive="active" [routerLink]="nav.url"> {{ nav.title }} </a>
-</nav>
+<header>
+  <nav>
+    <a *ngFor="let nav of navigations" routerLinkActive="active" [routerLink]="nav.url"> {{ nav.title }} </a>
+  </nav>
+</header>
+
+<br>
 
 <router-outlet></router-outlet>

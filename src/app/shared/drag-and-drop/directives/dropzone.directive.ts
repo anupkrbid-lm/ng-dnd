@@ -1,10 +1,10 @@
 import {
   Directive,
-  OnInit,
-  HostBinding,
-  HostListener,
-  Output,
+  ElementRef,
   EventEmitter,
+  HostBinding,
+  OnInit,
+  Output,
   SkipSelf
 } from '@angular/core';
 
@@ -21,9 +21,12 @@ export class DropzoneDirective implements OnInit {
   @Output() drop = new EventEmitter<PointerEvent>();
   @Output() remove = new EventEmitter<PointerEvent>();
 
+  private clientRect: ClientRect;
+
   constructor(
     @SkipSelf() private globalDroppableService: DroppableService,
-    private localDroppableService: DroppableService
+    private localDroppableService: DroppableService,
+    private element: ElementRef
   ) {}
 
   ngOnInit(): void {
@@ -35,6 +38,14 @@ export class DropzoneDirective implements OnInit {
       this.onGlobalDragEnd(event)
     );
 
+    this.globalDroppableService.dragMove$.subscribe(event => {
+      if (this.isEventInside(event)) {
+        this.onPointerEnter();
+      } else {
+        this.onPointerLeave();
+      }
+    });
+
     // Local Service Instance
     this.localDroppableService.dragStart$.subscribe(event =>
       this.onLocalDragStart(event)
@@ -44,16 +55,23 @@ export class DropzoneDirective implements OnInit {
     );
   }
 
-  @HostListener('pointerenter')
-  onPointerEnter(): void {
+  private isEventInside(event: PointerEvent): boolean {
+    return (
+      event.clientX >= this.clientRect.left &&
+      event.clientX <= this.clientRect.right &&
+      event.clientY >= this.clientRect.top &&
+      event.clientY <= this.clientRect.bottom
+    );
+  }
+
+  private onPointerEnter(): void {
     if (!this.activated) {
       return;
     }
     this.entered = true;
   }
 
-  @HostListener('pointerleave')
-  onPointerLeave(): void {
+  private onPointerLeave(): void {
     if (!this.activated) {
       return;
     }
@@ -61,10 +79,15 @@ export class DropzoneDirective implements OnInit {
   }
 
   onGlobalDragStart(event: PointerEvent): void {
+    this.clientRect = this.element.nativeElement.getBoundingClientRect();
     this.activated = true;
   }
 
   onGlobalDragEnd(event: PointerEvent): void {
+    if (!this.activated) {
+      return;
+    }
+
     if (this.entered) {
       console.log('dropped');
       this.drop.emit(event);
@@ -80,6 +103,7 @@ export class DropzoneDirective implements OnInit {
 
   onLocalDragEnd(event: PointerEvent): void {
     if (!this.entered) {
+      console.log('removed');
       this.remove.emit(event);
     }
     this.activated = false;

@@ -2,11 +2,12 @@ a {
   display: inline-block;
   padding: 5px;
   text-decoration: none;
+  font-weight: bold;
   color: darkorchid;
 }
 
-a:active,
+a:focus,
 a:hover,
 a.active {
-  font-weight: bold;
+  border-bottom: 2px solid darkorchid;
 }
